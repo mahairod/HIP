@@ -133,6 +133,8 @@ struct hipFloatComplex {
     __device__ __host__ hipFloatComplex() : x(0.0f), y(0.0f) {}
     __device__ __host__ hipFloatComplex(float x) : x(x), y(0.0f) {}
     __device__ __host__ hipFloatComplex(float x, float y) : x(x), y(y) {}
+    __device__ __host__ float real() const { return x; }
+    __device__ __host__ float imag() const { return y; }
     MAKE_COMPONENT_CONSTRUCTOR_TWO_COMPONENT(hipFloatComplex, unsigned short)
     MAKE_COMPONENT_CONSTRUCTOR_TWO_COMPONENT(hipFloatComplex, signed short)
     MAKE_COMPONENT_CONSTRUCTOR_TWO_COMPONENT(hipFloatComplex, unsigned int)
@@ -153,6 +155,8 @@ struct hipDoubleComplex {
     __device__ __host__ hipDoubleComplex() : x(0.0f), y(0.0f) {}
     __device__ __host__ hipDoubleComplex(double x) : x(x), y(0.0f) {}
     __device__ __host__ hipDoubleComplex(double x, double y) : x(x), y(y) {}
+    __device__ __host__ float real() const { return x; }
+    __device__ __host__ float imag() const { return y; }
     MAKE_COMPONENT_CONSTRUCTOR_TWO_COMPONENT(hipDoubleComplex, unsigned short)
     MAKE_COMPONENT_CONSTRUCTOR_TWO_COMPONENT(hipDoubleComplex, signed short)
     MAKE_COMPONENT_CONSTRUCTOR_TWO_COMPONENT(hipDoubleComplex, unsigned int)
@@ -262,6 +266,14 @@ __device__ __host__ static inline double hipCreal(hipDoubleComplex z) { return z
 
 __device__ __host__ static inline double hipCimag(hipDoubleComplex z) { return z.y; }
 
+__device__ __host__ static inline float hipCargf(hipFloatComplex z) {
+    return atan2f(z.imag(), z.real());
+}
+
+__device__ __host__ static inline hipFloatComplex hipClogf(hipFloatComplex z) {
+    return make_hipFloatComplex(hipCabsf(z), hipCargf(z));
+}
+
 __device__ __host__ static inline hipDoubleComplex make_hipDoubleComplex(double a, double b) {
     hipDoubleComplex z;
     z.x = a;
@@ -337,6 +349,14 @@ __device__ __host__ static inline hipDoubleComplex hipCfma(hipDoubleComplex p, h
     return make_hipDoubleComplex(real, imag);
 }
 
+__device__ __host__ static inline float hipCarg(hipDoubleComplex z) {
+    return atan2(z.imag(), z.real());
+}
+
+__device__ __host__ static inline hipDoubleComplex hipClog(hipDoubleComplex z) {
+    return make_hipDoubleComplex(hipCabs(z), hipCarg(z));
+}
+
 // Complex functions returning real numbers.
 #define __DEFINE_HIP_COMPLEX_REAL_FUN(func, hipFun) \
 __device__ __host__ inline float func(const hipFloatComplex& z) { return hipFun##f(z); } \
@@ -345,6 +365,7 @@ __device__ __host__ inline double func(const hipDoubleComplex& z) { return hipFu
 __DEFINE_HIP_COMPLEX_REAL_FUN(abs, hipCabs)
 __DEFINE_HIP_COMPLEX_REAL_FUN(real, hipCreal)
 __DEFINE_HIP_COMPLEX_REAL_FUN(imag, hipCimag)
+__DEFINE_HIP_COMPLEX_REAL_FUN(arg, hipCarg)
 
 // Complex functions returning complex numbers.
 #define __DEFINE_HIP_COMPLEX_FUN(func, hipFun) \
@@ -352,5 +373,6 @@ __device__ __host__ inline hipFloatComplex func(const hipFloatComplex& z) { retu
 __device__ __host__ inline hipDoubleComplex func(const hipDoubleComplex& z) { return hipFun(z); }
 
 __DEFINE_HIP_COMPLEX_FUN(conj, hipConj)
+__DEFINE_HIP_COMPLEX_FUN(log, hipClog)
 
 #endif
