@@ -595,6 +595,16 @@ extern "C" __device__ void *__amdgcn_get_dynamicgroupbaseptr();
 
 #include <hip/hcc_detail/math_functions.h>
 
+// Support std::complex.
+#pragma push_macro("__CUDA__")
+#define __CUDA__
+#include <__clang_cuda_math_forward_declares.h>
+#include <__clang_cuda_complex_builtins.h>
+#include <cuda_wrappers/algorithm>
+#include <cuda_wrappers/complex>
+#undef __CUDA__
+#pragma pop_macro("__CUDA__")
+
 #endif
 
 #endif  // HIP_HCC_DETAIL_RUNTIME_H
