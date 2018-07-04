@@ -735,6 +735,8 @@ int64_t __lanemask_lt()
     return ballot;
 }
 
+#ifdef __HIP_DEVICE_COMPILE__
+
 __device__
 inline
 void* __get_dynamicgroupbaseptr()
@@ -748,6 +750,8 @@ inline
 void *__amdgcn_get_dynamicgroupbaseptr() {
     return __get_dynamicgroupbaseptr();
 }
+
+#endif // __HIP_DEVICE_COMPILE__
 
 #endif // __HCC_OR_HIP_CLANG__
 
